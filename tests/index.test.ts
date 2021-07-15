@@ -1,5 +1,3 @@
-import { main } from "@src/lib";
-
 test("main", () => {
-  expect(typeof main(new Date())).toBe("number");
+  expect(typeof new Date().getTime()).toBe("number");
 });

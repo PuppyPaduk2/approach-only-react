@@ -5,7 +5,7 @@ module.exports = function (api) {
     presets: [
       ["@babel/preset-typescript"],
       ["@babel/preset-react"],
-      ["@babel/preset-env"],
+      ["@babel/preset-env", { corejs: { version: 3 }, useBuiltIns: "usage" }],
     ],
     plugins: [
       ["@babel/plugin-proposal-decorators", { decoratorsBeforeExport: true }],
@@ -14,7 +14,6 @@ module.exports = function (api) {
       ["@babel/plugin-transform-arrow-functions"],
       ["@babel/plugin-transform-object-assign"],
       ["@babel/transform-runtime", { useESModules: false, regenerator: true }],
-      ["module-resolver", { root: ["./"], alias: { "@src": "./src" } }],
     ],
     ignore: [
       /node_modules\/(?!(color-convert|ansi-styles|strip-ansi|ansi-regex|debug|react-dev-utils|chalk|acorn-jsx|punycode)\/).*/,
