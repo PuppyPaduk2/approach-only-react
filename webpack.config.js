@@ -45,6 +45,7 @@ module.exports = (env = {}, argv) => {
       },
     },
     output: {
+      publicPath: "/",
       filename: "index.js",
       path: path.resolve(process.cwd(), "dist"),
     },
@@ -61,6 +62,7 @@ module.exports = (env = {}, argv) => {
       }),
     ],
     devServer: {
+      transportMode: "ws",
       historyApiFallback: true,
       hot: true,
       inline: true,
