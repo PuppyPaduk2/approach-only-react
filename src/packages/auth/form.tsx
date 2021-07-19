@@ -1,12 +1,14 @@
+import { LockOutlined, UserOutlined } from "@ant-design/icons";
 import { Button, Form, Input } from "antd";
 import React, { FC, useCallback, useState } from "react";
 import styled from "styled-components";
-import { UserOutlined, LockOutlined } from "@ant-design/icons";
-import { useSetToken } from "@src/contexts";
-import { api } from "@src/api";
 
-export const PageAuth: FC = () => {
-  const setToken = useSetToken();
+import hooks from "@src/packages/auth/hooks";
+import { routePaths } from "@src/settings/route-paths";
+
+const AuthForm: FC = () => {
+  const tokenState = hooks.useToken();
+  const [, setToken] = tokenState;
 
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -16,7 +18,8 @@ export const PageAuth: FC = () => {
 
   const send = useCallback(() => {
     if (login && password) {
-      api.signIn({ login, password }).then(setToken);
+      setToken("token-asd-123");
+      // api.signIn({ login, password }).then(setToken);
     } else {
       if (!login) {
         setLoginError("Enter login");
@@ -26,6 +29,8 @@ export const PageAuth: FC = () => {
       }
     }
   }, [login, password]);
+
+  hooks.useGuardTokenRevert({ path: routePaths.dashboard, tokenState });
 
   return (
     <Container>
@@ -70,3 +75,5 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
 `;
+
+export default AuthForm;

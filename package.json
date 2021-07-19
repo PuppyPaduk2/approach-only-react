@@ -8,7 +8,7 @@
     "postinstall": "npx husky install",
     "test": "jest",
     "test:watch": "jest --watch",
-    "build": "tsc --project tsconfig.types.json && webpack",
+    "build": "tsc --project tsconfig.types.json && webpack --mode=production",
     "setup:git-cz": "commitizen init git-cz --save-dev --save-exact",
     "commit": "git-cz",
     "release": "standard-version",
