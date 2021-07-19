@@ -1,8 +1,9 @@
 import { Button, Form, Input } from "antd";
-import React, { FC, useState } from "react";
+import React, { FC, useCallback, useState } from "react";
 import styled from "styled-components";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 import { useSetToken } from "@src/contexts";
+import { api } from "@src/api";
 
 export const PageAuth: FC = () => {
   const setToken = useSetToken();
@@ -12,6 +13,19 @@ export const PageAuth: FC = () => {
 
   const [loginError, setLoginError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
+
+  const send = useCallback(() => {
+    if (login && password) {
+      api.signIn({ login, password }).then(setToken);
+    } else {
+      if (!login) {
+        setLoginError("Enter login");
+      }
+      if (!password) {
+        setPasswordError("Enter password");
+      }
+    }
+  }, [login, password]);
 
   return (
     <Container>
@@ -41,18 +55,7 @@ export const PageAuth: FC = () => {
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" block onClick={() => {
-            if (login && password) {
-              setToken("token-asd-123");
-            } else {
-              if (!login) {
-                setLoginError("Enter login");
-              }
-              if (!password) {
-                setPasswordError("Enter password");
-              }
-            }
-          }}>
+          <Button type="primary" block onClick={send}>
             sign in
           </Button>
         </Form.Item>
