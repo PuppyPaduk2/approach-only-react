@@ -1,24 +1,34 @@
-import React, { FC } from "react";
-import { Button, Layout as AntLayout, Menu, Space } from "antd";
+import React, { FC, ReactNode } from "react";
+import { Layout as AntLayout, Space } from "antd";
 import styled from "styled-components";
 
 const { Header: AntHeader, Content: AntContent } = AntLayout;
 
-export const Layout: FC = (props) => {
+export const Layout: FC<{
+  headerMenu?: ReactNode;
+  headerExtra?: ReactNode;
+}> = (props) => {
+  console.log("@@@Layout render");
+
   return (
     <Container>
       <AntLayout data-id="layout">
         <AntHeader data-id="header" style={{ position: "sticky", top: 0, zIndex: 1000 }}>
-          <Menu theme="dark" mode="horizontal">
-            <Menu.Item>
+          <Space size="middle">
+            {props.headerMenu}
+          </Space>
+          {/* <div>asdasdasd</div> */}
+          {/* <Menu theme="dark" mode="horizontal">
+            <Menu.Item key="test-1">
               <span>Test 1</span>
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item key="test-2">
               <span>Test 2</span>
             </Menu.Item>
-          </Menu>
+          </Menu> */}
           <Space size="middle">
-            <Button type="primary">Sign out</Button>
+            {props.headerExtra}
+            {/* <Button type="primary">Sign out</Button> */}
           </Space>
         </AntHeader>
         <ContentContainer>

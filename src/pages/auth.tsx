@@ -1,14 +1,14 @@
 import { LockOutlined, UserOutlined } from "@ant-design/icons";
+import { useApi } from "@src/hooks/api";
+import { useToken } from "@src/hooks/token";
+import { apiPaths } from "@src/settings/api-paths";
 import { Button, Form, Input } from "antd";
 import React, { FC, useCallback, useState } from "react";
 import styled from "styled-components";
 
-import hooks from "@src/packages/auth/hooks";
-import { routePaths } from "@src/settings/route-paths";
-
-const AuthForm: FC = () => {
-  const tokenState = hooks.useToken();
-  const [, setToken] = tokenState;
+export const PageAuth: FC = () => {
+  const api = useApi();
+  const [, setToken] = useToken();
 
   const [login, setLogin] = useState<string>("");
   const [password, setPassword] = useState<string>("");
@@ -16,10 +16,19 @@ const AuthForm: FC = () => {
   const [loginError, setLoginError] = useState<string>("");
   const [passwordError, setPasswordError] = useState<string>("");
 
+  const [pending, setPending] = useState<boolean>(false);
+
   const send = useCallback(() => {
     if (login && password) {
-      setToken("token-asd-123");
-      // api.signIn({ login, password }).then(setToken);
+      setPending(true);
+      api.post<string>(apiPaths.tokens, { login, password })
+        .then(({ data }) => {
+          setToken(data);
+          setPending(false);
+        })
+        .catch(() => {
+          setPending(false);
+        });
     } else {
       if (!login) {
         setLoginError("Enter login");
@@ -28,9 +37,7 @@ const AuthForm: FC = () => {
         setPasswordError("Enter password");
       }
     }
-  }, [login, password]);
-
-  hooks.useGuardTokenRevert({ path: routePaths.dashboard, tokenState });
+  }, [api, login, password]);
 
   return (
     <Container>
@@ -60,7 +67,7 @@ const AuthForm: FC = () => {
           />
         </Form.Item>
         <Form.Item>
-          <Button type="primary" block onClick={send}>
+          <Button type="primary" block loading={pending} onClick={send}>
             sign in
           </Button>
         </Form.Item>
@@ -75,5 +82,3 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
 `;
-
-export default AuthForm;

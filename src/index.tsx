@@ -1,48 +1,105 @@
-import * as React from "react";
-import * as ReactDOM from "react-dom";
-import { BrowserRouter, Route, Switch } from "react-router-dom";
+import React, { FC, useState } from "react";
+import { render } from "react-dom";
+import { BrowserRouter, Link, matchPath, Redirect, Route, Switch, useLocation } from "react-router-dom";
+import { Menu } from "antd";
 import 'antd/dist/antd.css';
-import { CenterSpin, Layout } from "@src/libs/ui-kit";
 
+import "./mock";
 import "./styles.css";
-import { Import } from "./libs/utils/react";
-import { sleep } from "./libs/utils/native";
-import { SpinSize } from "antd/lib/spin";
+import { nonceContext, tokenContext } from "./contexts/token";
+import { useNonce, useSetupNonce } from "./hooks/token";
+import { routePaths } from "./settings/route-paths";
+import { readToken } from "./utils/token";
+import { createApi } from "./utils/api";
+import { apiContext } from "./contexts/api";
+import { useSetupApi } from "./hooks/api";
+import { CenterSpin, Layout } from "./libs/ui-kit";
 
-const importAuthApp = () => import("@src/packages/auth/app").then(sleep());
-const importDashboardApp = () => import("@src/packages/dashboard/app").then(sleep());
-const importRolesApp = () => import("@src/packages/roles/app").then(sleep());
+import { PageAuth } from "./pages/auth";
+import { PageRoles } from "./pages/roles";
+import { PageDashboard } from "./pages/dashboard";
 
-const CommonSuspense: React.FC<{
-  import: Import<React.ComponentType<any>>;
-  spinSize?: SpinSize;
-}> = (props) => {
-  const Component = React.lazy(props.import);
+const Context: FC = (props) => {
+  const tokenState = useState(readToken());
+  const nonceState = useState<string>("");
+  const api = createApi();
+
   return (
-    <React.Suspense fallback={<CenterSpin size={props.spinSize ?? "large"} />}>
-      <Component />
-    </React.Suspense>
+    <tokenContext.Provider value={tokenState}>
+      <nonceContext.Provider value={nonceState}>
+        <apiContext.Provider value={api}>
+          {props.children}
+        </apiContext.Provider>
+      </nonceContext.Provider>
+    </tokenContext.Provider>
   );
 };
 
-ReactDOM.render(
-  <BrowserRouter>
+const LayoutMenu: FC = () => {
+  const { pathname } = useLocation();
+  const isDashboard = matchPath(pathname, routePaths.dashboard);
+  const isRoles = matchPath(pathname, routePaths.roles);
+  const selectedKeys = [
+    isDashboard ? "dashboard" : "",
+    isRoles ? "roles" : "",
+  ].filter(Boolean);
+
+  return (
+    <Menu
+      theme="dark"
+      mode="horizontal"
+      selectedKeys={selectedKeys}
+    >
+      <Menu.Item key="dashboard">
+        <Link to={routePaths.dashboard}>Dashboard</Link>
+      </Menu.Item>
+      <Menu.Item key="roles">
+        <Link to={routePaths.roles}>Roles</Link>
+      </Menu.Item>
+    </Menu>
+  );
+};
+
+const Setup: FC = () => {
+  const [nonce] = useNonce();
+
+  const pendingSetupApi = useSetupApi();
+  const pendingSetupNonce = useSetupNonce();
+  const pendingSetup = pendingSetupApi || pendingSetupNonce;
+
+  if (pendingSetup) {
+    return <CenterSpin size="large" />;
+  }
+
+  return nonce ? (
+    <Layout
+      headerMenu={<LayoutMenu />}
+    >
+      <Switch>
+        <Route path={routePaths.roles} component={PageRoles} />
+        <Route path={routePaths.dashboard} component={PageDashboard} />
+        <Route path={routePaths.error404} />
+        <Route path="*">
+          <Redirect to={routePaths.dashboard} />
+        </Route>
+      </Switch>
+    </Layout>
+  ) : (
     <Switch>
-      <Route path="/roles">
-        <Layout>
-          <CommonSuspense import={importRolesApp} />
-        </Layout>
+      <Route path={routePaths.auth} component={PageAuth} />
+      <Route path={routePaths.error404} />
+      <Route path="*">
+        <Redirect to={routePaths.auth} />
       </Route>
-      <Route path="/dashboard">
-        <Layout>
-          <CommonSuspense import={importDashboardApp} />
-        </Layout>
-      </Route>
-      <Route path="/auth">
-        <CommonSuspense import={importAuthApp} />
-      </Route>
-      <Route path="*">404</Route>
     </Switch>
+  );
+};
+
+render(
+  <BrowserRouter>
+    <Context>
+      <Setup />
+    </Context>
   </BrowserRouter>,
   document.getElementById("root")
 );
