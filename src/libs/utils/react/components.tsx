@@ -1,5 +1,5 @@
 import React, { ComponentType, FC, ReactNode } from "react";
-import { load } from "./hooks";
+import { useImport } from "./hooks";
 import { Import } from "./types";
 
 export const ComponentNull: FC = () => null;
@@ -10,7 +10,7 @@ export function Importer<Result>(props: {
   fallback: ReactNode;
 }) {
   const Component = props.component;
-  const result = load(props.import);
+  const result = useImport(props.import);
 
   if (result) {
     return <Component result={result} />;
