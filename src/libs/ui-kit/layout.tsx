@@ -1,15 +1,13 @@
-import React, { FC, ReactNode } from "react";
+import React, { memo, PropsWithChildren, ReactNode } from "react";
 import { Layout as AntLayout, Space } from "antd";
 import styled from "styled-components";
 
 const { Header: AntHeader, Content: AntContent } = AntLayout;
 
-export const Layout: FC<{
+export const Layout = memo<PropsWithChildren<{
   headerMenu?: ReactNode;
   headerExtra?: ReactNode;
-}> = (props) => {
-  console.log("@@@Layout render");
-
+}>>((props) => {
   return (
     <Container>
       <AntLayout data-id="layout">
@@ -17,18 +15,8 @@ export const Layout: FC<{
           <Space size="middle">
             {props.headerMenu}
           </Space>
-          {/* <div>asdasdasd</div> */}
-          {/* <Menu theme="dark" mode="horizontal">
-            <Menu.Item key="test-1">
-              <span>Test 1</span>
-            </Menu.Item>
-            <Menu.Item key="test-2">
-              <span>Test 2</span>
-            </Menu.Item>
-          </Menu> */}
           <Space size="middle">
             {props.headerExtra}
-            {/* <Button type="primary">Sign out</Button> */}
           </Space>
         </AntHeader>
         <ContentContainer>
@@ -38,7 +26,7 @@ export const Layout: FC<{
       </AntLayout>
     </Container>
   );
-};
+});
 
 const Container = styled.div`
   height: 100%;

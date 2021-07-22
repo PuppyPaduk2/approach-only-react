@@ -15,10 +15,7 @@ export const useToken = () => {
   return tokenState;
 };
 
-export const useNonce = () => {
-  const nonceState = useContext(nonceContext);
-  return nonceState;
-};
+export const useNonce = () => useContext(nonceContext);
 
 export const useSetupNonce = () => {
   const api = useApi();
@@ -30,15 +27,10 @@ export const useSetupNonce = () => {
     if (token) {
       if (!nonce) {
         setPending(true);
-        api.post<string>(apiPaths.nonces, { token })
-          .then(({ data }) => {
-            setNonce(data);
-            setPending(false);
-          })
-          .catch(() => {
-            setToken("");
-            setPending(false);
-          });
+        api.post<{ nonce: string }>(apiPaths.nonces, { token })
+          .then(({ data }) => setNonce(data.nonce))
+          .catch(() => setToken(""))
+          .then(() =>  setPending(false));
       }
     } else {
       setNonce("");

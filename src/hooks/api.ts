@@ -2,9 +2,7 @@ import { apiContext } from "@src/contexts/api";
 import { useContext, useEffect, useState } from "react";
 import { useNonce } from "./token";
 
-export const useApi = () => {
-  return useContext(apiContext);
-};
+export const useApi = () => useContext(apiContext);
 
 export const useSetupApi = () => {
   const api = useApi();
@@ -21,7 +19,7 @@ export const useSetupApi = () => {
     const interceptorResponse = api.interceptors.response.use(
       (response) => response,
       (error) => {
-        switch (error.response.status) {
+        switch (error?.response?.status) {
           case 401:
             setNonce("");
             break;

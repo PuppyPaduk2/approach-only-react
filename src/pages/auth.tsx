@@ -21,9 +21,9 @@ export const PageAuth: FC = () => {
   const send = useCallback(() => {
     if (login && password) {
       setPending(true);
-      api.post<string>(apiPaths.tokens, { login, password })
+      api.post<{ token: string }>(apiPaths.tokens, { login, password })
         .then(({ data }) => {
-          setToken(data);
+          setToken(data.token);
           setPending(false);
         })
         .catch(() => {

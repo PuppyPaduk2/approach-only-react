@@ -1,4 +1,6 @@
 export const apiPaths = {
-  nonces: "/nonces",
   tokens: "/tokens",
+  nonces: "/nonces",
+  userSettings: "/user-settings",
+  roles: "/roles",
 };
